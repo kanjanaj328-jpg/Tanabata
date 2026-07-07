@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>七夕 - Tanabata Wish Tree | 願いの短冊</title>
+<meta name="description" content="七夕の夜、あなたの願いを短冊に込めて竹に飾りましょう。Tanabata Wish Tree - เขียนคำอธิษฐานและแขวนบนต้นไผ่ในคืนเทศกาลทานาบาตะ">
+
+<!-- ============================================================
+     FONTS: Zen Maru Gothic (display, รูปทรงกลมอบอุ่น) + Noto Sans JP (body)
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SECTION: NIGHT SKY BACKGROUND
+     ภาพศาลเจ้าญี่ปุ่นตอนกลางคืน (วาดด้วย SVG/CSS ทั้งหมด เพื่อให้ใช้งานได้ทันทีแบบออฟไลน์)
+     Layer: ท้องฟ้า > ดาว > พระจันทร์ > ดาวตก > ภูเขา/ศาลเจ้า silhouette > หมอก
+     ============================================================ -->
+<div class="sky-layer" aria-hidden="true">
+  <div class="sky-gradient"></div>
+
+  <!-- พระจันทร์ -->
+  <div class="moon">
+    <div class="moon-glow"></div>
+    <div class="moon-craters"></div>
+  </div>
+
+  <!-- คอนเทนเนอร์ดาว (สร้างด้วย JS) -->
+  <div class="stars-field" id="starsField"></div>
+
+  <!-- คอนเทนเนอร์ดาวตก (สร้างด้วย JS) -->
+  <div class="shooting-stars" id="shootingStars"></div>
+
+  <!-- เส้นทางช้างเผือก (Milky Way) แบบเบลอ -->
+  <div class="milky-way"></div>
+
+  <!-- ภาพศาลเจ้าญี่ปุ่น silhouette เบลอเล็กน้อย ลด brightness อยู่ชั้นหลังสุด -->
+  <div class="shrine-scene">
+    <svg class="shrine-svg" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- เทือกเขาไกล -->
+      <path class="mountain-far" d="M0,420 L120,360 L260,410 L400,340 L560,400 L700,330 L860,400 L1020,350 L1180,410 L1340,360 L1600,420 L1600,500 L0,500 Z"/>
+      <!-- เทือกเขาใกล้ -->
+      <path class="mountain-near" d="M0,460 L180,400 L340,450 L520,390 L700,440 L900,410 L1080,460 L1260,420 L1440,455 L1600,430 L1600,500 L0,500 Z"/>
+      <!-- ศาลเจ้าหลัก (Honden) -->
+      <g class="shrine-building" transform="translate(560,300)">
+        <!-- ฐาน -->
+        <rect x="-140" y="110" width="280" height="20" class="shrine-base"/>
+        <!-- ตัวอาคาร -->
+        <rect x="-110" y="55" width="220" height="65" class="shrine-wall"/>
+        <!-- เสาไม้ -->
+        <rect x="-100" y="55" width="10" height="65" class="shrine-pillar"/>
+        <rect x="-40" y="55" width="10" height="65" class="shrine-pillar"/>
+        <rect x="30" y="55" width="10" height="65" class="shrine-pillar"/>
+        <rect x="90" y="55" width="10" height="65" class="shrine-pillar"/>
+        <!-- หลังคาชั้นล่าง -->
+        <polygon points="-140,55 0,-10 140,55" class="shrine-roof"/>
+        <polygon points="-150,58 0,-16 150,58 150,48 0,-26 -150,48" class="shrine-roof-edge"/>
+        <!-- หลังคาชั้นบน (สอง tier) -->
+        <rect x="-60" y="-10" width="120" height="16" class="shrine-roof-mid"/>
+        <polygon points="-72,-10 0,-58 72,-10" class="shrine-roof"/>
+        <polygon points="-78,-8 0,-64 78,-8 78,-16 0,-72 -78,-16" class="shrine-roof-edge"/>
+        <!-- โคมไฟทรงกลม -->
+        <circle cx="-100" cy="90" r="9" class="lantern"/>
+        <circle cx="100" cy="90" r="9" class="lantern"/>
+      </g>
+      <!-- โตริอิ (ประตูศาลเจ้า) -->
+      <g class="torii" transform="translate(1120,340)">
+        <rect x="-90" y="-10" width="14" height="150" class="torii-pillar"/>
+        <rect x="76" y="-10" width="14" height="150" class="torii-pillar"/>
+        <rect x="-105" y="-30" width="210" height="18" class="torii-top"/>
+        <rect x="-95" y="-52" width="190" height="14" class="torii-top-upper" rx="2"/>
+        <rect x="-14" y="-10" width="28" height="16" class="torii-beam"/>
+      </g>
+      <!-- ต้นสนโปร่งด้านหน้า -->
+      <g class="pine-cluster">
+        <ellipse cx="180" cy="470" rx="70" ry="34" class="pine-tree"/>
+        <ellipse cx="240" cy="480" rx="55" ry="26" class="pine-tree"/>
+        <ellipse cx="1420" cy="470" rx="80" ry="36" class="pine-tree"/>
+        <ellipse cx="1500" cy="485" rx="50" ry="24" class="pine-tree"/>
+      </g>
+    </svg>
+    <!-- หมอกลอยเบา ๆ -->
+    <div class="mist mist-1"></div>
+    <div class="mist mist-2"></div>
+  </div>
+
+  <!-- โคมไฟลอย (Tourou Nagashi) เพิ่มบรรยากาศ -->
+  <div class="floating-lanterns" id="floatingLanterns"></div>
+</div>
+
+<!-- ============================================================
+     SECTION: HEADER / TITLE
+     ============================================================ -->
+<header class="site-header">
+  <p class="header-eyebrow">星に願いを込めて</p>
+  <h1 class="header-title">
+    <span class="title-kanji">七夕</span>
+    <span class="title-sub">TANABATA WISH TREE</span>
+  </h1>
+  <p class="header-desc">彦星と織姫が再会する夜 — あなたの願いを短冊に書いて、竹に飾りましょう</p>
+</header>
+
+<!-- ============================================================
+     SECTION: MAIN STAGE (ต้นไผ่ + Panel ซ้ายขวา)
+     ============================================================ -->
+<main class="stage">
+
+  <!-- ---------- LEFT PANEL: เลือกสีกระดาษ短冊 ---------- -->
+  <aside class="panel panel-left" aria-label="เลือกสีของกระดาษคำอธิษฐาน">
+    <h2 class="panel-title"><span class="panel-title-jp">短冊の色</span><span class="panel-title-th">เลือกสีคำอธิษฐาน</span></h2>
+    <div class="color-cards" id="colorCardsLeft">
+      <!-- การ์ดสีจะถูกสร้างซ้ำด้วย JS เพื่อความสม่ำเสมอของข้อมูล -->
+    </div>
+  </aside>
+
+  <!-- ---------- CENTER: ต้นไผ่ใหญ่ ---------- -->
+  <div class="bamboo-container" id="bambooContainer">
+    <svg class="bamboo-svg" id="bambooSVG" viewBox="0 0 900 900" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="stalkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#3f6b47"/>
+          <stop offset="45%" stop-color="#5f9468"/>
+          <stop offset="55%" stop-color="#6fa876"/>
+          <stop offset="100%" stop-color="#375c3e"/>
+        </linearGradient>
+        <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#7fb686"/>
+          <stop offset="100%" stop-color="#3c6b46"/>
+        </linearGradient>
+        <radialGradient id="groundGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#d4af7a" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="#d4af7a" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- แสงนวลที่โคนต้นไผ่ -->
+      <ellipse cx="450" cy="860" rx="260" ry="46" fill="url(#groundGlow)"/>
+
+      <!-- กลุ่มลำต้นไผ่หลัก 3 ลำ พร้อมข้อไผ่ -->
+      <g id="bambooStalks" class="bamboo-stalks">
+
+        <!-- ลำต้นที่ 1 (ซ้าย เอียงเล็กน้อย) -->
+        <g class="stalk stalk-wind" style="--sway-delay:0s;--sway-origin:340px 860px;" transform="translate(0,0)">
+          <path d="M320,860 C300,700 330,560 300,420 C280,320 310,220 296,90"
+                stroke="url(#stalkGradient)" stroke-width="26" fill="none" stroke-linecap="round"/>
+          <!-- ข้อปล้องไผ่ -->
+          <g class="bamboo-nodes" stroke="#284a30" stroke-width="4" opacity="0.55">
+            <line x1="288" y1="760" x2="330" y2="758"/>
+            <line x1="298" y1="640" x2="336" y2="636"/>
+            <line x1="292" y1="520" x2="322" y2="516"/>
+            <line x1="286" y1="400" x2="314" y2="396"/>
+            <line x1="292" y1="280" x2="316" y2="276"/>
+            <line x1="288" y1="160" x2="308" y2="156"/>
+          </g>
+        </g>
+
+        <!-- ลำต้นที่ 2 (กลาง สูงสุด) -->
+        <g class="stalk stalk-wind" style="--sway-delay:0.6s;--sway-origin:450px 860px;" transform="translate(0,0)">
+          <path d="M450,862 C462,700 428,540 448,380 C462,260 432,150 450,40"
+                stroke="url(#stalkGradient)" stroke-width="32" fill="none" stroke-linecap="round"/>
+          <g class="bamboo-nodes" stroke="#284a30" stroke-width="4.5" opacity="0.55">
+            <line x1="424" y1="760" x2="478" y2="760"/>
+            <line x1="430" y1="620" x2="484" y2="618"/>
+            <line x1="424" y1="480" x2="472" y2="478"/>
+            <line x1="432" y1="340" x2="464" y2="338"/>
+            <line x1="428" y1="200" x2="466" y2="198"/>
+            <line x1="432" y1="80" x2="466" y2="78"/>
+          </g>
+        </g>
+
+        <!-- ลำต้นที่ 3 (ขวา เอียงเล็กน้อย) -->
+        <g class="stalk stalk-wind" style="--sway-delay:1.1s;--sway-origin:590px 860px;" transform="translate(0,0)">
+          <path d="M600,861 C620,710 588,560 610,410 C626,300 596,200 616,100"
+                stroke="url(#stalkGradient)" stroke-width="24" fill="none" stroke-linecap="round"/>
+          <g class="bamboo-nodes" stroke="#284a30" stroke-width="4" opacity="0.55">
+            <line x1="586" y1="760" x2="628" y2="758"/>
+            <line x1="596" y1="640" x2="634" y2="636"/>
+            <line x1="600" y1="520" x2="630" y2="516"/>
+            <line x1="606" y1="400" x2="630" y2="396"/>
+            <line x1="600" y1="280" x2="628" y2="276"/>
+            <line x1="608" y1="170" x2="628" y2="166"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- กิ่งไผ่และใบไผ่ (โยกไหวตลอดเวลา + แกว่งแรงตอนลมพัด) -->
+      <g id="bambooBranches" class="bamboo-branches">
+
+        <!-- กิ่งชุดที่ 1 -->
+        <g class="branch" style="--branch-delay:0.1s;--branch-origin:300px 640px;">
+          <path d="M300,640 C260,620 220,600 170,606" class="branch-stem"/>
+          <path d="M270,624 C232,606 196,588 150,590" class="branch-stem thin"/>
+          <g class="leaf-cluster" transform="translate(150,590)">
+            <path class="leaf" d="M0,0 C-40,-8 -78,-2 -108,14 C-76,10 -42,10 0,0 Z"/>
+            <path class="leaf" d="M-10,10 C-46,10 -80,24 -104,44 C-72,30 -40,20 -10,10 Z"/>
+            <path class="leaf" d="M6,-6 C-24,-26 -56,-38 -92,-38 C-58,-30 -26,-18 6,-6 Z"/>
+          </g>
+          <g class="leaf-cluster" transform="translate(170,606)">
+            <path class="leaf" d="M0,0 C-30,10 -56,28 -70,50 C-46,34 -20,18 0,0 Z"/>
+            <path class="leaf" d="M4,-4 C-20,-22 -48,-32 -76,-30 C-48,-22 -22,-12 4,-4 Z"/>
+          </g>
+        </g>
+
+        <!-- กิ่งชุดที่ 2 -->
+        <g class="branch" style="--branch-delay:0.4s;--branch-origin:328px 480px;">
+          <path d="M328,480 C286,462 244,452 200,462" class="branch-stem"/>
+          <path d="M312,460 C270,440 230,430 190,436" class="branch-stem thin"/>
+          <g class="leaf-cluster" transform="translate(200,462)">
+            <path class="leaf" d="M0,0 C-36,-10 -70,-4 -98,12 C-66,8 -34,8 0,0 Z"/>
+            <path class="leaf" d="M-6,10 C-40,12 -72,26 -94,46 C-64,30 -32,18 -6,10 Z"/>
+            <path class="leaf" d="M8,-8 C-20,-28 -52,-40 -86,-38 C-54,-30 -22,-18 8,-8 Z"/>
+          </g>
+          <g class="leaf-cluster" transform="translate(190,436)">
+            <path class="leaf" d="M2,-2 C-24,-20 -52,-28 -80,-24 C-50,-16 -22,-8 2,-2 Z"/>
+            <path class="leaf" d="M-2,8 C-28,18 -52,34 -68,54 C-44,36 -20,20 -2,8 Z"/>
+          </g>
+        </g>
+
+        <!-- กิ่งชุดที่ 3 (ฝั่งขวาบน) -->
+        <g class="branch" style="--branch-delay:0.2s;--branch-origin:610px 380px;">
+          <path d="M610,380 C654,364 696,356 738,366" class="branch-stem"/>
+          <path d="M624,352 C666,336 706,328 746,336" class="branch-stem thin"/>
+          <g class="leaf-cluster" transform="translate(738,366)" style="transform-origin:0 0;">
+            <path class="leaf" d="M0,0 C36,-8 68,-2 96,14 C66,10 34,10 0,0 Z"/>
+            <path class="leaf" d="M8,10 C42,10 74,24 96,44 C66,30 36,20 8,10 Z"/>
+            <path class="leaf" d="M-4,-6 C24,-26 54,-38 88,-38 C56,-30 24,-18 -4,-6 Z"/>
+          </g>
+          <g class="leaf-cluster" transform="translate(746,336)">
+            <path class="leaf" d="M0,-4 C28,-20 54,-28 80,-24 C52,-16 24,-8 0,-4 Z"/>
+            <path class="leaf" d="M0,6 C26,14 48,28 62,46 C40,30 18,18 0,6 Z"/>
+          </g>
+        </g>
+
+        <!-- กิ่งชุดที่ 4 -->
+        <g class="branch" style="--branch-delay:0.55s;--branch-origin:606,230px;">
+          <path d="M606,230 C648,212 690,204 730,212" class="branch-stem"/>
+          <path d="M594,204 C634,186 674,178 712,186" class="branch-stem thin"/>
+          <g class="leaf-cluster" transform="translate(730,212)">
+            <path class="leaf" d="M0,0 C32,-8 62,-2 88,12 C60,8 30,8 0,0 Z"/>
+            <path class="leaf" d="M6,10 C36,12 66,26 86,44 C58,30 28,18 6,10 Z"/>
+          </g>
+          <g class="leaf-cluster" transform="translate(712,186)">
+            <path class="leaf" d="M-2,-4 C24,-20 50,-26 74,-22 C48,-14 22,-6 -2,-4 Z"/>
+            <path class="leaf" d="M0,6 C22,14 42,26 54,42 C36,28 16,16 0,6 Z"/>
+          </g>
+        </g>
+
+        <!-- กิ่งชุดที่ 5 (ยอดบนสุด) -->
+        <g class="branch" style="--branch-delay:0.75s;--branch-origin:450px 60px;">
+          <path d="M450,60 C420,36 388,20 350,18" class="branch-stem thin"/>
+          <path d="M452,50 C482,28 514,14 550,14" class="branch-stem thin"/>
+          <g class="leaf-cluster" transform="translate(350,18)">
+            <path class="leaf" d="M0,0 C-28,-10 -54,-8 -76,4 C-50,2 -24,4 0,0 Z"/>
+            <path class="leaf" d="M2,8 C-20,10 -42,20 -58,36 C-38,24 -18,14 2,8 Z"/>
+          </g>
+          <g class="leaf-cluster" transform="translate(550,14)">
+            <path class="leaf" d="M0,0 C28,-10 54,-8 76,4 C50,2 24,4 0,0 Z"/>
+            <path class="leaf" d="M-2,8 C20,10 42,20 58,36 C38,24 18,14 -2,8 Z"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- ตำแหน่งกิ่งสำหรับแขวน短冊 (ใช้อ้างอิงพิกัดใน JS) -->
+      <g id="tanzakuLayer" class="tanzaku-layer"></g>
+    </svg>
+
+    <!-- จำนวนคำอธิษฐานทั้งหมด -->
+    <div class="wish-counter">
+      <span class="wish-counter-num" id="wishCount">0</span>
+      <span class="wish-counter-label">願いの数 · จำนวนคำอธิษฐาน</span>
+    </div>
+  </div>
+
+  <!-- ---------- RIGHT PANEL: ความหมายของสี (ต่อ) ---------- -->
+  <aside class="panel panel-right" aria-label="เลือกสีของกระดาษคำอธิษฐาน">
+    <h2 class="panel-title"><span class="panel-title-jp">意味</span><span class="panel-title-th">ความหมายของสี</span></h2>
+    <div class="color-cards" id="colorCardsRight">
+      <!-- การ์ดสีจะถูกสร้างซ้ำด้วย JS -->
+    </div>
+  </aside>
+
+</main>
+
+<!-- ============================================================
+     SECTION: WISH FORM (ฟอร์มเขียนคำอธิษฐาน)
+     ============================================================ -->
+<section class="wish-form-section" id="wishFormSection">
+  <div class="wish-form glass-panel">
+    <div class="wish-form-header">
+      <span class="wish-form-kanji">あなたの願い</span>
+      <span class="wish-form-sub">เขียนคำอธิษฐานของคุณลงบนกระดาษ短冊</span>
+    </div>
+
+    <div class="selected-color-preview" id="selectedColorPreview" aria-live="polite">
+      <span class="preview-strip" id="previewStrip"></span>
+      <span class="preview-text" id="previewText">เลือกสี短冊จากการ์ดด้านข้าง</span>
+    </div>
+
+    <textarea
+      id="wishInput"
+      class="wish-textarea"
+      maxlength="80"
+      rows="3"
+      placeholder="เขียนคำอธิษฐานของคุณที่นี่... (สูงสุด 80 ตัวอักษร)"
+      aria-label="กล่องข้อความสำหรับเขียนคำอธิษฐาน"
+    ></textarea>
+
+    <div class="wish-form-footer">
+      <span class="char-count"><span id="charCount">0</span>/80</span>
+      <button type="button" class="wish-submit-btn" id="wishSubmitBtn">
+        <span class="btn-kanji">願いを飾る</span>
+        <span class="btn-th">แขวนคำอธิษฐาน</span>
+      </button>
+    </div>
+    <p class="wish-form-hint" id="wishFormHint" role="status"></p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION: TOOLTIP (แสดงตอน Hover短冊)
+     ============================================================ -->
+<div class="tanzaku-tooltip" id="tanzakuTooltip" role="tooltip">
+  <p class="tooltip-text" id="tooltipText"></p>
+</div>
+
+<!-- ============================================================
+     SECTION: POPUP GLASSMORPHISM (แสดงตอนคลิก短冊)
+     ============================================================ -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup-card glass-panel" role="dialog" aria-modal="true" aria-labelledby="popupWishText">
+    <button class="popup-close" id="popupClose" aria-label="ปิดหน้าต่าง">×</button>
+    <div class="popup-color-strip" id="popupColorStrip"></div>
+    <p class="popup-meaning" id="popupMeaning"></p>
+    <p class="popup-wish-text" id="popupWishText"></p>
+    <p class="popup-date" id="popupDate"></p>
+    <button class="popup-delete-btn" id="popupDeleteBtn">ลบคำอธิษฐานนี้</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <p>七夕 · Tanabata Wish Tree — คำอธิษฐานทุกใบถูกบันทึกไว้ในเครื่องของคุณ (LocalStorage)</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
